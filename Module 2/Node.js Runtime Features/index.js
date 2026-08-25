@@ -41,7 +41,7 @@ function streamFile() {
   readable.pipe(writable);
 
   writable.on('finish', () => {
-    console.log('stream: finished copying via chunks (flat memory)');
+    console.log('stream: finished copying via 64KB chunks (flat memory)');
   });
 }
 
