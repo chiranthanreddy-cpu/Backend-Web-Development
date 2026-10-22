@@ -9,10 +9,23 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use('/auth', authRoutes);
+
 app.use((error, req, res, next) => {
-  console.error(error.message);
-  res.status(500).json({ error: { code: 'INTERNAL_ERROR', message: 'Internal server error' } });
+  const status = error.statusCode || 500;
+  const code = error.code || (status === 500 ? 'INTERNAL_ERROR' : 'BAD_REQUEST');
+  const message = status === 500 ? 'Internal server error' : error.message;
+
+  return res.status(status).json({
+    error: {
+      code,
+      message,
+    },
+  });
 });
 
 const port = Number(process.env.PORT || 3000);
-app.listen(port, () => console.log(`API listening on ${port}`));
+if (require.main === module) {
+  app.listen(port, () => console.log(`API listening on ${port}`));
+}
+
+module.exports = app;
